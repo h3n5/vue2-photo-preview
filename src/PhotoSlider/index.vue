@@ -4,15 +4,15 @@
       v-if="photoVisible"
       class="PhotoSlider__Wrapper"
       :class="{
-        'PhotoSlider__Clean': showAnimateType !== ShowAnimateEnum.None ,
-        'PhotoSlider__Hide': !overlayVisible,
+        PhotoSlider__Clean: showAnimateType !== ShowAnimateEnum.None,
+        PhotoSlider__Hide: !overlayVisible,
       }"
     >
       <div
         class="PhotoSlider__Backdrop"
         :class="{
-          'PhotoSlider__fadeIn': showAnimateType === ShowAnimateEnum.In,
-          'PhotoSlider__fadeOut': showAnimateType === ShowAnimateEnum.Out
+          PhotoSlider__fadeIn: showAnimateType === ShowAnimateEnum.In,
+          PhotoSlider__fadeOut: showAnimateType === ShowAnimateEnum.Out,
         }"
         :style="{
           background: `rgba(0, 0, 0, ${backdropOpacity})`,
@@ -26,27 +26,27 @@
         <div class="PhotoSlider__BannerRight">
           <download
             class="PhotoSlider__BannerIcon"
-            @click="handleDownload"
+            @click.native="handleDownload"
           />
           <rotate-left
             class="PhotoSlider__BannerIcon"
-            @click="handleRotateLeft"
+            @click.native="handleRotateLeft"
           />
           <rotate-right
             class="PhotoSlider__BannerIcon"
-            @click="handleRotateRight"
+            @click.native="handleRotateRight"
           />
           <flip-horizontal
             class="PhotoSlider__BannerIcon"
-            @click="toggleFlipHorizontal"
+            @click.native="toggleFlipHorizontal"
           />
           <flip-vertical
             class="PhotoSlider__BannerIcon"
-            @click="toggleFlipVertical"
+            @click.native="toggleFlipVertical"
           />
           <close
             class="PhotoSlider__BannerIcon"
-            @click="handleClickClose"
+            @click.native="handleClickClose"
           />
         </div>
       </div>
@@ -57,7 +57,7 @@
         :style="{
           left: getItemLeft(currentIndex),
           transition: getItemTransition(),
-          transform: getItemTransform()
+          transform: getItemTransform(),
         }"
         @transitionend="resetNeedTransition"
         @click="handleClickMask"
@@ -90,17 +90,14 @@
           <arrow-right />
         </div>
       </template>
-      <div
-        v-if="currentItem.intro"
-        class="PhotoSlider__FooterWrap"
-      >
+      <div v-if="currentItem.intro" class="PhotoSlider__FooterWrap">
         {{ currentItem.intro }}
       </div>
     </div>
   </teleport>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
 import { defineComponent, computed, toRefs, PropType } from 'vue';
 import PhotoView from '../PhotoView/index.vue';
 import { horizontalOffset, minSwitchImageOffset } from '../constant';
@@ -115,12 +112,18 @@ import FlipHorizontal from './FlipHorizontal.vue';
 import FlipVertical from './FlipVertical.vue';
 import Download from './Download.vue';
 import useAnimationHandle from './useAnimationHandle';
-import { ItemType, ShowAnimateEnum, TouchTypeEnum, EdgeTypeEnum } from '../types';
+import {
+  ItemType,
+  ShowAnimateEnum,
+  TouchTypeEnum,
+  EdgeTypeEnum,
+} from '../types';
 import isTouchDevice from '../utils/isTouchDevice';
-
+import Teleport from 'vue2-teleport';
 export default defineComponent({
   name: 'PhotoSlider',
   components: {
+    Teleport,
     PhotoView,
     Close,
     ArrowLeft,
@@ -187,7 +190,7 @@ export default defineComponent({
     downloadMethod: {
       type: Function as PropType<(item: ItemType) => void | null>,
       default: null,
-    }
+    },
   },
   emits: ['clickPhoto', 'clickMask', 'changeIndex', 'closeModal'],
   setup(props) {
@@ -197,9 +200,8 @@ export default defineComponent({
     });
 
     useBodyEffect(visible);
-    const {
-      photoVisible, showAnimateType, originRect, onShowAnimateEnd
-    } = useAnimationHandle(visible, currentItem);
+    const { photoVisible, showAnimateType, originRect, onShowAnimateEnd } =
+      useAnimationHandle(visible, currentItem);
     const { innerWidth } = useInnerWidth();
 
     return {
@@ -241,8 +243,11 @@ export default defineComponent({
         const connect = this.items.concat(this.items).concat(this.items);
         return connect.slice(len + this.index - 1, len + this.index + 2);
       }
-      return this.items.slice(Math.max(this.index - 1, 0), Math.min(this.index + 2, len));
-    }
+      return this.items.slice(
+        Math.max(this.index - 1, 0),
+        Math.min(this.index + 2, len)
+      );
+    },
   },
   created() {
     window.addEventListener('keydown', this.handleKeyDown);
@@ -266,7 +271,7 @@ export default defineComponent({
         canvas.width = img.width;
         canvas.height = img.height;
         context?.drawImage(img, 0, 0, img.width, img.height);
-        canvas.toBlob(blob => {
+        canvas.toBlob((blob) => {
           if (blob) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -319,7 +324,11 @@ export default defineComponent({
         }
       }
     },
-    handleSingleTap(_clientX: number, _clientY: number, e: MouseEvent | TouchEvent) {
+    handleSingleTap(
+      _clientX: number,
+      _clientY: number,
+      e: MouseEvent | TouchEvent
+    ) {
       if (this.toggleOverlay) {
         this.overlayVisible = !this.overlayVisible;
       }
@@ -331,7 +340,13 @@ export default defineComponent({
       this.clientX = clientX;
       this.clientY = clientY;
     },
-    handleTouchMove(touchType: TouchTypeEnum, clientX: number, clientY: number, lastScale: number, edgeTypes: EdgeTypeEnum[]) {
+    handleTouchMove(
+      touchType: TouchTypeEnum,
+      clientX: number,
+      clientY: number,
+      lastScale: number,
+      edgeTypes: EdgeTypeEnum[]
+    ) {
       if (touchType === TouchTypeEnum.Scale && lastScale !== 1) {
         this.handleTouchScaleMove(clientX, edgeTypes);
       }
@@ -357,7 +372,8 @@ export default defineComponent({
       // 非循环模式下，第一张和最后一张超出时拖拽距离减半
       if (
         !this.loop &&
-        ((this.index === 0 && touchMoveX > 0) || (this.index === this.items.length - 1 && touchMoveX < 0))
+        ((this.index === 0 && touchMoveX > 0) ||
+          (this.index === this.items.length - 1 && touchMoveX < 0))
       ) {
         touchMoveX = touchMoveX / 2;
       }
@@ -368,14 +384,23 @@ export default defineComponent({
     handleTouchVerticalMove(clientX: number, clientY: number) {
       let touchMoveY = Math.abs(clientY - this.clientY);
       const opacity = Math.max(
-        Math.min(this.defaultBackdropOpacity, this.defaultBackdropOpacity - touchMoveY / 100 / 4),
+        Math.min(
+          this.defaultBackdropOpacity,
+          this.defaultBackdropOpacity - touchMoveY / 100 / 4
+        ),
         0
       );
 
       this.hasMove = clientX !== this.clientX || clientY !== this.clientY;
       this.backdropOpacity = opacity;
     },
-    handleTouchEnd(touchType: TouchTypeEnum, clientX: number, clientY: number, lastScale: number, edgeTypes: EdgeTypeEnum[]) {
+    handleTouchEnd(
+      touchType: TouchTypeEnum,
+      clientX: number,
+      clientY: number,
+      lastScale: number,
+      edgeTypes: EdgeTypeEnum[]
+    ) {
       if (touchType === TouchTypeEnum.Scale && lastScale !== 1) {
         this.handleTouchScaleEnd(clientX, edgeTypes);
       }
@@ -398,11 +423,17 @@ export default defineComponent({
     handleTouchScaleEnd(clientX: number, edgeTypes: EdgeTypeEnum[]) {
       const offsetX = clientX - this.clientX;
       // 下一张
-      if (offsetX < -minSwitchImageOffset && edgeTypes.includes(EdgeTypeEnum.Right)) {
+      if (
+        offsetX < -minSwitchImageOffset &&
+        edgeTypes.includes(EdgeTypeEnum.Right)
+      ) {
         this.handleNext();
       }
       // 上一张
-      if (offsetX > minSwitchImageOffset && edgeTypes.includes(EdgeTypeEnum.Left)) {
+      if (
+        offsetX > minSwitchImageOffset &&
+        edgeTypes.includes(EdgeTypeEnum.Left)
+      ) {
         this.handlePrevious();
       }
     },
@@ -471,9 +502,12 @@ export default defineComponent({
       return this.shouldTransition ? transition : undefined;
     },
     getItemTransform() {
-      return `translate3d(${-(this.innerWidth + this.horizontalOffset) * this.virtualIndex + this.touchMoveX}px, 0px, 0px)`;
-    }
-  }
+      return `translate3d(${
+        -(this.innerWidth + this.horizontalOffset) * this.virtualIndex +
+        this.touchMoveX
+      }px, 0px, 0px)`;
+    },
+  },
 });
 </script>
 
@@ -493,7 +527,7 @@ export default defineComponent({
   .PhotoSlider__ArrowRight,
   .PhotoSlider__FooterWrap {
     opacity: 0;
-    @media (any-hover: hover){
+    @media (any-hover: hover) {
       &:hover {
         opacity: 0;
       }
@@ -552,7 +586,7 @@ export default defineComponent({
     transition: opacity 0.2s ease-out;
     z-index: 20;
 
-    @media (any-hover: hover){
+    @media (any-hover: hover) {
       &:hover {
         opacity: 1;
       }
@@ -578,7 +612,7 @@ export default defineComponent({
         cursor: pointer;
         transition: all 0.2s linear;
 
-        @media (any-hover: hover){
+        @media (any-hover: hover) {
           &:hover {
             opacity: 1;
           }
@@ -624,7 +658,7 @@ export default defineComponent({
     justify-content: center;
     align-items: center;
 
-    @media (any-hover: hover){
+    @media (any-hover: hover) {
       &:hover {
         opacity: 1;
       }
@@ -656,7 +690,7 @@ export default defineComponent({
     transition: opacity 0.2s ease-out;
     z-index: 20;
 
-    @media (any-hover: hover){
+    @media (any-hover: hover) {
       &:hover {
         opacity: 1;
       }

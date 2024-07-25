@@ -1,23 +1,24 @@
 <template>
-  <!-- @slot 默认插槽 -->
-  <slot />
-  <photo-slider
-    :visible="visible"
-    :index="index"
-    :should-transition="shouldTransition"
-    :toggle-overlay="!photoClosable"
-    :default-backdrop-opacity="defaultBackdropOpacity"
-    :items="items"
-    :loop="loop"
-    :download-method="downloadMethod"
-    @clickPhoto="handleClickPhoto"
-    @clickMask="handleClickMask"
-    @changeIndex="updateIndex"
-    @closeModal="handleHide"
-  />
+  <div>
+    <slot />
+    <photo-slider
+      :visible="visible"
+      :index="index"
+      :should-transition="shouldTransition"
+      :toggle-overlay="!photoClosable"
+      :default-backdrop-opacity="defaultBackdropOpacity"
+      :items="items"
+      :loop="loop"
+      :download-method="downloadMethod"
+      @clickPhoto="handleClickPhoto"
+      @clickMask="handleClickMask"
+      @changeIndex="updateIndex"
+      @closeModal="handleHide"
+    />
+  </div>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
 import { defineComponent, PropType, provide } from 'vue';
 import { updateItemKey, removeItemKey, handleShowKey } from '../symbols';
 import useItems from './useItems';
@@ -29,7 +30,7 @@ import { ItemType } from '../types';
 export default defineComponent({
   name: 'PhotoProvider',
   components: {
-    PhotoSlider
+    PhotoSlider,
   },
   props: {
     /**
@@ -73,7 +74,7 @@ export default defineComponent({
     downloadMethod: {
       type: Function as PropType<(item: ItemType) => void | null>,
       default: null,
-    }
+    },
   },
   emits: ['indexChange', 'visibleChange'],
   setup(_props, { emit }) {
@@ -85,7 +86,11 @@ export default defineComponent({
     };
     const { index, updateIndex } = useIndex(onIndexChange);
     const { items, updateItem, removeItem } = useItems(index);
-    const { visible, handleHide, handleShow } = useVisible(items, index, onVisibleChange);
+    const { visible, handleHide, handleShow } = useVisible(
+      items,
+      index,
+      onVisibleChange
+    );
 
     provide(updateItemKey, updateItem);
     provide(removeItemKey, removeItem);
@@ -112,10 +117,9 @@ export default defineComponent({
       if (this.maskClosable) {
         this.handleHide();
       }
-    }
-  }
+    },
+  },
 });
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

@@ -6,16 +6,16 @@
     height="44"
     viewBox="0 0 768 768"
   >
-    <path d="M640.5 352.5v63h-390l178.5 180-45 45-256.5-256.5 256.5-256.5 45 45-178.5 180h390z" />
+    <path
+      d="M640.5 352.5v63h-390l178.5 180-45 45-256.5-256.5 256.5-256.5 45 45-178.5 180h390z"
+    />
   </svg>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
-export default defineComponent({
-});
+export default defineComponent({});
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

@@ -1,7 +1,7 @@
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import typescript from 'rollup-plugin-typescript2';
-import vue from 'rollup-plugin-vue';
+import typescript from '@rollup/plugin-typescript';
+import vue from 'rollup-plugin-vue2';
 import postcss from 'rollup-plugin-postcss';
 import external from 'rollup-plugin-peer-deps-external';
 import autoprefixer from 'autoprefixer';
@@ -18,7 +18,7 @@ export default {
       exports: 'named',
       sourcemap: true,
       globals: {
-        'vue': 'Vue',
+        vue: 'Vue',
       },
     },
     {
@@ -26,19 +26,19 @@ export default {
       format: 'es',
       exports: 'named',
       sourcemap: true,
-    }
+    },
   ],
   plugins: [
     vue(),
     postcss({
       extract: 'index.css',
-      plugins: [autoprefixer()]
+      plugins: [autoprefixer()],
     }),
     typescript({
-      useTsconfigDeclarationDir: true
+      compilerOptions: { lib: ['es5', 'es6', 'dom'], target: 'es5' },
     }),
     commonjs(),
     nodeResolve(),
-    external()
-  ]
+    external(),
+  ],
 };
